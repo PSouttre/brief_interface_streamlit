@@ -91,15 +91,12 @@ if input_km:
 
 
 
-
-
-
 # Création du input pour la date de vente
 
 
     # Changement du type
 #print(df.dtypes)
-df['saledate'] = pd.to_datetime(df['saledate'], utc = True)
+df['saledate'] = pd.to_datetime(df['saledate'], utc = True).dt.tz_convert(None)
 #print(df.dtypes)
 
    
@@ -119,8 +116,8 @@ max_date = df['saledate'].max()
 
 input_date = st.date_input ('Choisir la date de vente', value = [min_date, max_date], format = 'DD.MM.YYYY')
 
-start_date = pd.to_datetime(input_date[0]).tz_localize('UTC') 
-end_date = pd.to_datetime(input_date[1]).tz_localize('UTC')
+start_date = pd.to_datetime(input_date[0]).tz_localize(None) 
+end_date = pd.to_datetime(input_date[1]).tz_localize(None)
 print(type(start_date), type(end_date))
 
     # Récupération des lignes 
@@ -135,4 +132,24 @@ st.dataframe(df, use_container_width=True, height=600,
              column_config=column_config)
     
 
+############################################################################################################################
+# BOUTON EXCEL
+############################################################################################################################
 
+from io import BytesIO 
+# Fonction pour convertir le DataFrame en un fichier Excel 
+def to_excel(df): 
+    output = BytesIO() 
+    writer = pd.ExcelWriter(output, engine='xlsxwriter') 
+    df.to_excel(writer, index=False, sheet_name='Sheet1') 
+    writer.close() 
+    processed_data = output.getvalue() 
+    return processed_data 
+
+df_xlsx = to_excel(df) 
+
+# Ajouter le bouton de téléchargement 
+st.download_button(label='Télécharger les données en Excel', 
+                   data=df_xlsx, 
+                   file_name='car_prices.xlsx', 
+                   mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
