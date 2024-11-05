@@ -37,11 +37,33 @@ if colonnes :
 # On change le type de la colonne 'make'
 df['make'] = df['make'].astype('category')
 
-print(df.dtypes)
+#print(df.dtypes)
 
 
-# Création du input pour la marque 
+# Création du input pour la marque et pour le modèle
 input_mark = st.text_input ('Marque du véhicule')
+if input_mark :
+    df = df[df['make'].isin([input_mark])]          # si la valeur dans la colonne est = à la valeur renseignée dans l'input c'est True  +  filtre du df pour filtrer les lignes
+    print(df)
+
+    if df.empty :
+        st.error(f"Cette marque n'existe pas dans la base")
+    else: 
+        print("Entrée input marque valide") 
+else: 
+    print("Marque filtrée")
+
+
+input_model = st.text_input ('Modèle du véhicule')
+if input_model :
+    df = df[df['model'].isin([input_model])]
+    if df.empty :
+        st.error(f"Ce modèle n'existe pas dans la base")
+    else: 
+        print("Entrée input modèle valide") 
+else: 
+    print("Modèle filtré")
+
 
 
 # Création du input pour le prix
@@ -50,7 +72,10 @@ max_price = df['sellingprice'].max()
 
 input_price = st.slider ('Prix', value = [min_price, max_price ])
 
+
+
 # Création du input pour la date de vente
+
 
     # Changement du type
 #print(df.dtypes)
@@ -76,5 +101,6 @@ st.dataframe(df, use_container_width=True, height=600,
 min_date = df['saledate'].min()
 max_date = df['saledate'].max()
 
-input_price = st.date_input ('Choisir la date de vente', value = [min_date, max_date], format = 'DD.MM.YYYY')
+input_date = st.date_input ('Choisir la date de vente', value = [min_date, max_date], format = 'DD.MM.YYYY')
+
 
