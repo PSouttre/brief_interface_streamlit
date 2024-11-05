@@ -67,10 +67,30 @@ else:
 
 
 # Création du input pour le prix
-min_price = df['sellingprice'].min()
-max_price = df['sellingprice'].max()
+min_price = int(df['sellingprice'].min())
+max_price = int(df['sellingprice'].max())
 
 input_price = st.slider ('Prix', value = [min_price, max_price ])
+
+    # Récupération des lignes 
+if input_price :
+    df = df[df['sellingprice'].between(left=input_price[0], right=input_price[1])]
+
+
+# Création du input pour les kilomètres
+min_km = int(df['odometer'].min())
+max_km = int(df['odometer'].max())
+
+input_km = st.slider ('Kilomètres', value = [min_km, max_km ])
+
+    # Récupération des lignes 
+if input_km:
+    df = df[df['odometer'].between(left=input_km[0], right=input_km[1])]
+
+
+
+
+
 
 
 
@@ -79,7 +99,7 @@ input_price = st.slider ('Prix', value = [min_price, max_price ])
 
     # Changement du type
 #print(df.dtypes)
-df['saledate'] = pd.to_datetime(df['saledate'])
+df['saledate'] = pd.to_datetime(df['saledate'], utc = True)
 #print(df.dtypes)
 
    
@@ -92,15 +112,27 @@ column_config = {
             step=1,
         ),
 }
-st.dataframe(df, use_container_width=True, height=600, 
-             hide_index=True,
-             column_config=column_config)
-    
 
     # Input
 min_date = df['saledate'].min()
 max_date = df['saledate'].max()
 
 input_date = st.date_input ('Choisir la date de vente', value = [min_date, max_date], format = 'DD.MM.YYYY')
+
+start_date = pd.to_datetime(input_date[0]).tz_localize('UTC') 
+end_date = pd.to_datetime(input_date[1]).tz_localize('UTC')
+print(type(start_date), type(end_date))
+
+    # Récupération des lignes 
+if start_date > end_date:
+    st.error("La date de début doit être antérieure à la date de fin.")
+else:
+    df = df[df['saledate'].between(left=start_date, right=end_date)]
+
+
+st.dataframe(df, use_container_width=True, height=600, 
+             hide_index=True,
+             column_config=column_config)
+    
 
 
