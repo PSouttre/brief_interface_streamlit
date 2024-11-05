@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
+st.title("Ventes de voiture aux Etats-Unis")
+
 # Récupération des données depuis un fichier csv
 df = pd.read_csv("./car_prices_clean.csv", delimiter = ',', encoding='utf-8')
 
@@ -12,10 +14,10 @@ df = pd.read_csv("./car_prices_clean.csv", delimiter = ',', encoding='utf-8')
 
 
 # Menu déroulant des colonnes
-colonnes = st.selectbox( 'Trier sur cette colonne :', ['year', 'make', 'model', 'trim', 'body', 'transmission', 'state', 'condition', 'odometer', 'color', 'interior', 'seller', 'mmr', 'sellingprice','saledate'], index = None, placeholder = 'Choisir une colonne' ) # enlever valeur par défaut
+colonnes = st.sidebar.selectbox( 'Trier sur cette colonne :', ['year', 'make', 'model', 'trim', 'body', 'transmission', 'state', 'condition', 'odometer', 'color', 'interior', 'seller', 'mmr', 'sellingprice','saledate'], index = None, placeholder = 'Choisir une colonne' ) # enlever valeur par défaut
 
 # Menu déroulant ascendant/descendant
-asc_desc = st.selectbox('Type de tri', ['Croissant', 'Décroissant'], index = None, placeholder = 'Choisir un ordre')
+asc_desc = st.sidebar.selectbox('Type de tri', ['Croissant', 'Décroissant'], index = None, placeholder = 'Choisir un ordre')
 
 # Tri selon la colonne sélectionnée
 if colonnes :
@@ -41,7 +43,7 @@ df['make'] = df['make'].astype('category')
 
 
 # Création du input pour la marque et pour le modèle
-input_mark = st.text_input ('Marque du véhicule')
+input_mark = st.sidebar.text_input ('Marque du véhicule')
 if input_mark :
     df = df[df['make'].isin([input_mark])]          # si la valeur dans la colonne est = à la valeur renseignée dans l'input c'est True  +  filtre du df pour filtrer les lignes
     print(df)
@@ -54,7 +56,7 @@ else:
     print("Marque filtrée")
 
 
-input_model = st.text_input ('Modèle du véhicule')
+input_model = st.sidebar.text_input ('Modèle du véhicule')
 if input_model :
     df = df[df['model'].isin([input_model])]
     if df.empty :
@@ -70,7 +72,7 @@ else:
 min_price = int(df['sellingprice'].min())
 max_price = int(df['sellingprice'].max())
 
-input_price = st.slider ('Prix', value = [min_price, max_price ])
+input_price = st.sidebar.slider ('Prix', value = [min_price, max_price ])
 
     # Récupération des lignes 
 if input_price :
@@ -81,7 +83,7 @@ if input_price :
 min_km = int(df['odometer'].min())
 max_km = int(df['odometer'].max())
 
-input_km = st.slider ('Kilomètres', value = [min_km, max_km ])
+input_km = st.sidebar.slider ('Kilomètres', value = [min_km, max_km ])
 
     # Récupération des lignes 
 if input_km:
@@ -114,7 +116,7 @@ column_config = {
 min_date = df['saledate'].min()
 max_date = df['saledate'].max()
 
-input_date = st.date_input ('Choisir la date de vente', value = [min_date, max_date], format = 'DD.MM.YYYY')
+input_date = st.sidebar.date_input ('Choisir la date de vente', value = [min_date, max_date], format = 'DD.MM.YYYY')
 
 start_date = pd.to_datetime(input_date[0]).tz_localize(None) 
 end_date = pd.to_datetime(input_date[1]).tz_localize(None)
