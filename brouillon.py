@@ -14,8 +14,7 @@ df = pd.read_csv("./car_prices_clean.csv", delimiter = ',', encoding='utf-8')
 
 
 # Menu déroulant des colonnes
-colonnes = st.sidebar.selectbox( 'Trier sur cette colonne :', df.columns , placeholder = 'Choisir une colonne')
-
+colonnes = st.sidebar.selectbox( 'Trier sur cette colonne :', df.columns , index = None, placeholder = 'Choisir une colonne')
 
 # Menu déroulant ascendant/descendant
 asc_desc = st.sidebar.selectbox('Type de tri', ['Croissant', 'Décroissant'], index = None, placeholder = 'Choisir un ordre')
@@ -44,7 +43,7 @@ df['make'] = df['make'].astype('category')
 # Création du input pour la marque et pour le modèle
 input_mark = st.sidebar.text_input ('Marque du véhicule')
 if input_mark :
-    df = df[df['make'].isin([input_mark])]          
+    df = df[df['make'].isin([input_mark])]          # si la valeur dans la colonne est = à la valeur renseignée dans l'input c'est True  +  filtre du df pour filtrer les lignes
     print(df)
 
     if df.empty :
@@ -128,44 +127,7 @@ else:
     df = df[df['saledate'].between(left=start_date, right=end_date)]
 
 
-#st.dataframe(df, use_container_width=True, height=600, 
-#             hide_index=True,
-#            column_config=column_config)
     
-
-############################################################################################################################
-# Filtrage automatique en fonction du type de données (optionnel)
-############################################################################################################################
-
-col_type = df[colonnes].dtype
-
-# Filtrer en fonction du type de colonne
-if col_type == 'object' or col_type == 'category':
-    # Pour les colonnes de type chaîne de caractères ou catégorie, utiliser un `selectbox`
-    unique_values = df[colonnes].dropna().unique()  # Récupérer les valeurs uniques
-    filter_value = st.sidebar.selectbox(f"Filtrer par {colonnes} (choisir une valeur)", unique_values, key=colonnes)
-    df = df[df[colonnes] == filter_value]  # Filtrer la DataFrame par la valeur choisie
-
-elif np.issubdtype(col_type, np.number):
-    # Pour les colonnes numériques (int64, float64), utiliser un `slider`
-    min_val = float(df[colonnes].min()) if not pd.isna(df[colonnes].min()) else 0
-    max_val = float(df[colonnes].max()) if not pd.isna(df[colonnes].max()) else 1000000
-    filter_value = st.sidebar.slider(f"Filtrer par {colonnes} (valeur numérique)", min_value=min_val, max_value=max_val, value=(min_val, max_val), key=colonnes)
-    df = df[df[colonnes].between(filter_value[0], filter_value[1])]  # Filtrer selon la plage choisie
-
-elif np.issubdtype(col_type, np.datetime64):
-    # Pour les colonnes de type datetime64, utiliser un `date_input`
-    min_date = df[colonnes].min().date() if not pd.isna(df[colonnes].min()) else pd.to_datetime("01-01-1900").date()
-    max_date = df[colonnes].max().date() if not pd.isna(df[colonnes].max()) else pd.to_datetime("01-01-2100").date()
-    filter_value = st.sidebar.date_inp5ut(f"Filtrer par {colonnes} (date)", min_value=min_date, max_value=max_date, value=(min_date, max_date), key=colonnes)
-    start_date = pd.to_datetime(filter_value[0])
-    end_date = pd.to_datetime(filter_value[1])
-    df = df[df[colonnes].between(start_date, end_date)]  # Filtrer selon la plage de dates choisie
-
-
-# Afficher la DataFrame filtrée
-st.dataframe(df, use_container_width=True, height=600)
-
 
 ############################################################################################################################
 # BOUTON EXCEL
@@ -195,6 +157,7 @@ st.dataframe(df, use_container_width=True, height=600)
 # BOUTON csv
 ############################################################################################################################
 
+
 @st.cache_data
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
@@ -209,3 +172,43 @@ st.download_button(
    "text/csv",
    key='download-csv'
 )
+
+
+############################################################################################################################
+# Filtrage automatique en fonction du type de données (optionnel)
+############################################################################################################################
+
+col_type = df[colonnes].dtype
+
+# Filtrer en fonction du type de colonne
+if col_type == 'object' or col_type == 'category':
+    # Pour les colonnes de type chaîne de caractères ou catégorie, utiliser un `selectbox`
+    unique_values = df[colonnes].dropna().unique()  # Récupérer les valeurs uniques
+    filter_value = st.sidebar.selectbox(f"Filtrer par {colonnes} (choisir une valeur)", unique_values, key=colonnes)
+    filtered_df = df[df[colonnes] == filter_value]  # Filtrer la DataFrame par la valeur choisie
+
+elif np.issubdtype(col_type, np.number):
+    # Pour les colonnes numériques (int64, float64), utiliser un `slider`
+    min_val = float(df[colonnes].min()) if not pd.isna(df[colonnes].min()) else 0
+    max_val = float(df[colonnes].max()) if not pd.isna(df[colonnes].max()) else 1000000
+    filter_value = st.sidebar.slider(f"Filtrer par {colonnes} (valeur numérique)", min_value=min_val, max_value=max_val, value=(min_val, max_val), key=colonnes)
+    filtered_df = df[df[colonnes].between(filter_value[0], filter_value[1])]  # Filtrer selon la plage choisie
+
+elif np.issubdtype(col_type, np.datetime64):
+    # Pour les colonnes de type datetime64, utiliser un `date_input`
+    min_date = df[colonnes].min().date() if not pd.isna(df[colonnes].min()) else pd.to_datetime("1900-01-01").date()
+    max_date = df[colonnes].max().date() if not pd.isna(df[colonnes].max()) else pd.to_datetime("2100-01-01").date()
+    filter_value = st.sidebar.date_input(f"Filtrer par {colonnes} (date)", min_value=min_date, max_value=max_date, value=(min_date, max_date), key=colonnes)
+    start_date = pd.to_datetime(filter_value[0])
+    end_date = pd.to_datetime(filter_value[1])
+    filtered_df = df[df[colonnes].between(start_date, end_date)]  # Filtrer selon la plage de dates choisie
+
+else:
+    filtered_df = df  # Pas de filtrage pour les autres types non pris en charge
+
+# Afficher la DataFrame filtrée
+st.dataframe(filtered_df, use_container_width=True, height=600)
+
+############################################################################################################################
+# GroupBy(optionnel)
+############################################################################################################################
