@@ -209,3 +209,30 @@ st.download_button(
    "text/csv",
    key='download-csv'
 )
+
+############################################################################################################################
+# GroupBy
+############################################################################################################################
+
+# Grouper selon la marque et faire la moyenne du prix de vente
+#df.groupby('make').agg(prix_moyen = ('sellingprice', 'mean'))
+
+# Ajout d'une option pour grouper par marque et calculer le prix moyen
+#st.sidebar.subheader("Analyse des prix par marque")
+
+# Option pour afficher le prix moyen par marque
+#show_grouped = st.sidebar.button("Afficher le prix moyen par marque")
+
+#if show_grouped:
+    # Effectuer le groupement par marque et calculer le prix moyen
+ #   df = df.groupby('make').agg(prix_moyen=('sellingprice', 'mean')).reset_index()
+
+    # Affichage du tableau des prix moyens
+  #  st.write("Prix moyen des véhicules par marque")
+   # st.dataframe(df, use_container_width=True)
+
+# Grouper selon la marque, le modèle, trim et body  et faire la moyenne des km, du prix de vente et de l'état
+#df.groupby(['make', 'model', 'trim', 'body'], as_index = False).agg( 
+ #   prix_moyen = ('sellingprice', 'mean'),
+  #  km_moyen = ('odometer', 'median')
+#)
