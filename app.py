@@ -128,9 +128,6 @@ else:
     df = df[df['saledate'].between(left=start_date, right=end_date)]
 
 
-#st.dataframe(df, use_container_width=True, height=600, 
-#             hide_index=True,
-#            column_config=column_config)
     
 
 ############################################################################################################################

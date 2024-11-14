@@ -4,7 +4,7 @@ import streamlit as st
 import datetime
 
 at = AppTest.from_file("app.py", default_timeout=10).run()
-#df = pd.read_csv("./car_prices_clean.csv", delimiter = ',', encoding='utf-8')
+df = pd.read_csv("./car_prices_clean.csv", delimiter = ',', encoding='utf-8')
 
 # Titre
 def test_title():
@@ -41,5 +41,8 @@ def test_model_text_input():
 
 # date_input
 def test_date_input():
+    at = AppTest.from_file("app.py", default_timeout=10).run()   # permet de réinitialiser et repartir de l'app d'origine
     assert at.date_input[0].value[0] == datetime.date(2014,1,1)
     assert at.date_input[0].value[1] == datetime.date(2015,7,21)
+
+
